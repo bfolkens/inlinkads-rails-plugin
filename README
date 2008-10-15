@@ -7,7 +7,9 @@ How to use the InLinkAds plugin in your Rails app.
 
 == Install
 
-Grab the plugin from TextLinkAds and copy into your plugin directory.
+Grab the plugin from GitHub and copy into your plugin directory:
+
+  script/plugin install git://github.com/bfolkens/inlinkads-rails-plugin.git
 
 == Update View
 
