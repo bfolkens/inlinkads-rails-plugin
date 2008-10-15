@@ -92,11 +92,11 @@ module InLinkAds
       end
     end
     
-    def read_posts
+    def read_posts(last, limit)
       raise 'Need to define "read_posts" in ApplicationController'
     end
     
-    def post_url
+    def post_url(record)
       raise 'Need to define "post_url" in ApplicationController'
     end
     
