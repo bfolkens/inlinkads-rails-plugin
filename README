@@ -1,0 +1,72 @@
+InLinkAds
+=================
+
+= Usage
+
+How to use the InLinkAds plugin in your Rails app.
+
+== Install
+
+Grab the plugin from TextLinkAds and copy into your plugin directory.
+
+== Update View
+
+The InLinkAds plugin gives you helpers for injecting the InLink Ads into your content:
+
+  <%= inject_inlink_ads(post_id, str) %>
+  <label for="post_title">Title</label>
+
+Where +post_id+ is a unique identifier to the page or post and +str+ is the content you wish to inject the InLink Ads into.
+
+== Update Controller
+
+Place the +inlink_ads_data+ method in the action that handles the view you wish to inject the ads into.  For example, in a controller +Page+ that handles showing the page with the action +show+, you might see something like the following:
+
+  class PageController < ApplicationController
+    def show
+      @page = Page.find(params[:id])
+      inlink_ads_data
+    end
+  end
+  
+The inlink_ads_data method creates an instance variable called +@links+ that contains the information for populating the links on the page.  The helper uses the data in this variable to inject the links into the content.
+  
+Somewhere in your +Page+ controller or your +Application+ controller, place the following:
+
+  class ApplicationController < ActionController::Base
+    private
+
+    def read_posts(last, limit)
+      Page.find :all, :conditions => ['id > ?', last], :order => 'id asc', :limit => limit
+    end
+
+    def post_url(post)
+      page_url(:id => post.id) + '.html'
+    end
+
+    def max_post_id
+      Page.calculate :max, :id
+    end
+  end
+  
+The InLinkAds service will make a GET request of your and pull the posts described by the methods above.  If your posts (or pages) are stored in a different model than "Post" then change the above to match your setup.  The important methods to define are:
+
+  * +read_posts+ - Returns posts starting with +last+ and returning a total of no more than +limit+
+  * +post_url+ - Returns the URL to the page for +post+
+  * +max_post_id+ - Returns the last id of posts
+  
+== Install the configuration
+
+Create a new file in your config/initializers directory called inlink_ads.rb, containing the following:
+
+  unless defined?(InLinkAds::CONFIG)
+    InLinkAds::CONFIG = { :url => 'http://www.url.for.app.com/', :key => 'YOUR_KEY_FROM_TEXTLINKADS' }
+  end
+  
+Replace the +url+ and +key+ with those appropriate for your site.
+
+== Install the pages into the TextLinkAds service
+
+Run the following rake task to send a request to the TextLinkAds site to install your InLinks:
+
+  rake inlinks:install
