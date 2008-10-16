@@ -36,6 +36,11 @@ The inlink_ads_data method creates an instance variable called +@links+ that con
 Somewhere in your +Page+ controller or your +Application+ controller, place the following:
 
   class ApplicationController < ActionController::Base
+		# This action should be placed where the root URL gets routed to in your application
+		def index
+			render_sync_posts
+		end
+
     private
 
     def read_posts(last, limit)
