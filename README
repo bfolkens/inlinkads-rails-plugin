@@ -51,11 +51,13 @@ Somewhere in your +Page+ controller or your +Application+ controller, place the 
     end
   end
   
-The InLinkAds service will make a GET request of your and pull the posts described by the methods above.  If your posts (or pages) are stored in a different model than "Post" then change the above to match your setup.  The important methods to define are:
+The InLinkAds service will make a GET request of your site and pull the posts described by the methods above.  If your posts (or pages) are stored in a different model than "Post" then change the above to match your setup.  The important methods to define are:
 
   * +read_posts+ - Returns posts starting with +last+ and returning a total of no more than +limit+
   * +post_url+ - Returns the URL to the page for +post+
   * +max_post_id+ - Returns the last id of posts
+
+Also, in your +Post+ model, make sure to have a method called +body+, where the plugin will read the content to be stored and linked to from the service.
   
 == Install the configuration
 
