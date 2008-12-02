@@ -16,7 +16,9 @@ module InLinkAds
           next unless link['PostID'].to_s == post_id.to_s
       
           # Substitute the first instance of text at word boundaries for link
-          out.sub! /\b(#{Regexp::escape(link['Text'][0])})\b/i, link_to('\1', link['URL'][0])
+          match_pattern = /\b(#{Regexp::escape(link['Text'][0])})\b/i
+          Rails.logger.debug "InLink Ads: searching for '#{link['Text'][0]}'"
+          out.sub! match_pattern, link_to('\1', link['URL'][0])
         end
       end
     end
@@ -73,15 +75,18 @@ module InLinkAds
       # is it time to update the cache?
       time = read_fragment(time_key)
       if time.nil? or time.to_time < Time.now
+        Rails.logger.debug "InLink Ads: last fragment time EXPIRED - refreshing '#{data_key}'"
         @links = requester(url)
     
         # if we can get the latest, then update the cache
         unless @links.nil?
+          Rails.logger.debug "InLink Ads: #{@links['Link'].size} ads retrieved from service"
           expire_fragment time_key
           expire_fragment data_key
           write_fragment time_key, Time.now + 1.hours  # used to be 6.hours but shortened it up for testing
           write_fragment data_key, @links
         else
+          Rails.logger.debug "InLink Ads: NO ads retrieved from service"
           # otherwise try again in 1 hour
           write_fragment time_key, Time.now + 1.hour
           @links = read_fragment(data_key)
