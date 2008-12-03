@@ -16,8 +16,9 @@ module InLinkAds
           next unless link['PostID'].to_s == post_id.to_s
       
           # Substitute the first instance of text at word boundaries for link
-          match_pattern = /\b(#{Regexp::escape(link['Text'][0])})\b/i
-          Rails.logger.debug "InLink Ads: searching for '#{link['Text'][0]}'"
+          keyword_pattern = Regexp::escape(link['Text'][0]).gsub(/\\ /, '\s+')
+          match_pattern = /\b(#{keyword_pattern})\b/im
+          Rails.logger.debug "InLink Ads: searching for '#{match_pattern.inspect}'"
           out.sub! match_pattern, link_to('\1', link['URL'][0])
         end
       end
