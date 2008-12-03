@@ -79,7 +79,7 @@ module InLinkAds
         @links = requester(url)
     
         # if we can get the latest, then update the cache
-        unless @links.nil?
+        unless @links.nil? or @links['Link'].nil?
           Rails.logger.debug "InLink Ads: #{@links['Link'].size} ads retrieved from service"
           expire_fragment time_key
           expire_fragment data_key
