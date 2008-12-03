@@ -20,7 +20,7 @@ silence_warnings do
         def post.id; 123; end
         def post.id_before_type_cast; 123; end
         post.title = "Hello World"
-        post.body = "Some text here that should get replaced with links."
+        post.body = "Some text here that should get replaced\n   with links."
       end
     end
     
@@ -72,7 +72,7 @@ class InLinkAdsTest < Test::Unit::TestCase
 
   def test_should_inject_ads
     inlink_ads_data
-    assert_equal 'Some text here that should get <a href="http://www.linkexample.com">replaced with</a> links.',
+    assert_equal %Q{Some text here that should get <a href="http://www.linkexample.com">replaced\n   with</a> links.},
                  inject_inlink_ads(@post.id, @post.body)
   end
   
@@ -81,7 +81,7 @@ class InLinkAdsTest < Test::Unit::TestCase
                 :textlinkads_action => 'sync_posts' }
     render_sync_posts
     assert_equal @rendered[:xml], <<-XML.strip
-<posts><post><id>123</id><title>Hello+World</title><date>Wed Dec 31 18:00:00 -0600 1969</date><url>http://www.mysite.com/posts/123</url><body>Some+text+here+that+should+get+replaced+with+links.</body></post></posts>
+<posts><post><id>123</id><title>Hello+World</title><date>Wed Dec 31 18:00:00 -0600 1969</date><url>http://www.mysite.com/posts/123</url><body>Some+text+here+that+should+get+replaced++++with+links.</body></post></posts>
     XML
   end
   
