@@ -1,15 +1,25 @@
 require 'net/http'
 require 'cgi'
+require 'active_support'
 
 module InLinkAds
+  class Config
+    cattr_accessor :key, :url
+    
+    def self.initialized?
+      !key.nil? and !url.nil?
+    end
+  end
+  
   def self.configured?
-    !CONFIG.nil? and !CONFIG[:key].nil? and !CONFIG[:url].nil?
+    Config::initialized?
   end
   
   module ViewHelper
     def inject_inlink_ads(post_id, str)
       return str unless InLinkAds::configured? and !@links.nil? and !@links['Link'].nil?
       
+      Rails.logger.debug "Checking post #{post_id.to_s} against #{@links['Link'].map {|link| link['PostID'].to_s.to_i}.sort.join(',')}"
       returning str.dup do |out|
         @links['Link'].each do |link|
           # Only use links for this post
@@ -29,8 +39,8 @@ module InLinkAds
     protected
     
     def render_sync_posts
-      unless params[:textlinkads_key] == InLinkAds::CONFIG[:key]
-        render :text => "Inlinks Ads: '#{InLinkAds::CONFIG[:key]}' expected but '#{params[:textlinkads_key]}' received from request instead", :status => 409
+      unless params[:textlinkads_key] == InLinkAds::Config.key
+        render :text => "Inlinks Ads: '#{InLinkAds::Config.key}' expected but '#{params[:textlinkads_key]}' received from request instead", :status => 409
         return false
       end
       
@@ -113,7 +123,7 @@ module InLinkAds
     private
     
     def request_url
-      "http://www.text-link-ads.com/xml.php?inventory_key=#{InLinkAds::CONFIG[:key]}"
+      "http://www.text-link-ads.com/xml.php?inventory_key=#{InLinkAds::Config.key}"
     end
   
     def requester(url)

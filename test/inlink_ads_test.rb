@@ -54,7 +54,9 @@ class InLinkAdsTest < Test::Unit::TestCase
   
   include InLinkAds::ViewHelper
   include InLinkAds::AdController
-  CONFIG = { :url => 'http://www.mysite.com/', :key => '01234567890123456789' }
+  
+  InLinkAds::Config.url = 'http://www.mysite.com/'
+  InLinkAds::Config.key = '01234567890123456789'
   
   def setup    
     @post = Post.example
@@ -77,7 +79,7 @@ class InLinkAdsTest < Test::Unit::TestCase
   end
   
   def test_should_respond_with_sync_posts
-    @params = { :textlinkads_key => CONFIG[:key],
+    @params = { :textlinkads_key => InLinkAds::Config.key,
                 :textlinkads_action => 'sync_posts' }
     render_sync_posts
     assert_equal @rendered[:xml], <<-XML.strip
