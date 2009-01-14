@@ -1,10 +1,12 @@
 require 'net/http'
 require 'cgi'
+require 'timeout'
 require 'active_support'
 
 module InLinkAds
   class Config
-    cattr_accessor :key, :url
+    cattr_accessor :key, :url, :timeout
+    @@timeout = 5
     
     def self.initialized?
       !key.nil? and !url.nil?
@@ -127,7 +129,12 @@ module InLinkAds
     end
   
     def requester(url)
-      XmlSimple.xml_in http_get(url)
+      Timeout::timeout(InLinkAds::Config.timeout) do
+        return XmlSimple.xml_in http_get(url)
+      end
+    rescue Timeout::Error => te
+      Rails.logger.error "InLink Ads: cannot retrieve ads from service, request timed out after #{InLinkAds::Config.timeout} seconds"
+      nil
     rescue
       nil
     end
