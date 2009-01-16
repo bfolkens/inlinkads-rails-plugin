@@ -97,16 +97,18 @@ module InLinkAds
           expire_fragment time_key
           expire_fragment data_key
           write_fragment time_key, Time.now + 1.hours  # used to be 6.hours but shortened it up for testing
-          write_fragment data_key, @links.to_yaml
+          write_fragment(data_key, @links && @links.to_yaml)
         else
           Rails.logger.debug "InLink Ads: NO ads retrieved from service"
           # otherwise try again in 1 hour
           write_fragment time_key, Time.now + 1.hour
-          @links = YAML.parse(read_fragment(data_key))
+          data = read_fragment(data_key)
+          @links = data ? YAML.load(data) : data
         end
       else
         # use the cache
-        @links = YAML.parse(read_fragment(data_key))
+        data = read_fragment(data_key)
+        @links = data ? YAML.load(data) : data
       end
     end
     
