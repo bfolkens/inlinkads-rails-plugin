@@ -37,12 +37,21 @@ module InLinkAds
     end
   end
   
-  module AdController    
+  module AdController
     protected
+
+    def textlinkads
+      if params.keys.any? {|key| key.to_s =~ /^textlinkads_/ }
+        render_sync_posts
+        return false
+      end
+      
+      true
+    end
     
     def render_sync_posts
       unless params[:textlinkads_key] == InLinkAds::Config.key
-        render :text => "Inlinks Ads: '#{InLinkAds::Config.key}' expected but '#{params[:textlinkads_key]}' received from request instead", :status => 409
+        render :text => "Inlinks Ads: invalid key", :status => 409
         return false
       end
       
@@ -71,7 +80,7 @@ module InLinkAds
         expire_fragment max_key
         render :text => 'reset max id'
       else
-        render :text => "Inlinks Ads: invalid action '#{params[:textlinkads_action]} received from request", :status => 409
+        render :text => "Inlinks Ads: invalid action", :status => 409
         return false
       end
       
