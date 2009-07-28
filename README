@@ -38,6 +38,10 @@ Somewhere in your +Page+ controller or your +Application+ controller, place the 
   class ApplicationController < ActionController::Base
     private
 
+    def read_post(id)
+      Page.find :first, :conditions => ['id = ?', id]
+    end
+
     def read_posts(last, limit)
       Page.find :all, :conditions => ['id > ?', last], :order => 'id asc', :limit => limit
     end
@@ -54,6 +58,7 @@ Somewhere in your +Page+ controller or your +Application+ controller, place the 
 The InLinkAds service will make a GET request of your site and pull the posts described by the methods above.  If your posts (or pages) are st
 ored in a different model than "Post" then change the above to match your setup.  The important methods to define are:
 
+  * +read_post+ - Returns one post that matches +id+
   * +read_posts+ - Returns posts starting with +last+ and returning a total of no more than +limit+
   * +post_url+ - Returns the URL to the page for +post+
   * +max_post_id+ - Returns the last id of posts
