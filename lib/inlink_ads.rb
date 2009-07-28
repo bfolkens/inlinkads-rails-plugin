@@ -57,14 +57,20 @@ module InLinkAds
       
       url = request_url
       last_key = "TLA/LAST/#{url}"
-      max_key = "TLA/MAX/#{url}"
-      time_key = "TLA/TIME/#{url}"
       last = read_fragment(last_key) || 0
+      max_key = "TLA/MAX/#{url}"
       max = read_fragment(max_key) || max_post_id
-            
+      time_key = "TLA/TIME/#{url}"
+      time = read_fragment(time_key)
+      last_modified_key = "TLA/LAST_MODIFIED/#{url}"
+      last_modified = read_fragment(last_modified_key)
+
       case params[:textlinkads_action]
       when 'debug'
-        render :xml => debug_data(:last_id => last, :max_id => max, :last_updated => read_fragment(time_key))
+        render :xml => debug_data(:last_id => last,
+                                  :max_id => max,
+                                  :last_updated => last_modified && last_modified.rfc2822,
+                                  :next_update => time && time.rfc2822)
       when 'sync_posts'
         if params[:textlinkads_post_id]
           posts = [read_post(params[:textlinkads_post_id])].compact
@@ -96,12 +102,14 @@ module InLinkAds
       url = request_url
       time_key = "TLA/TIME/#{url}"
       data_key = "TLA/DATA/#{url}"
+      last_modified_key = "TLA/LAST_MODIFIED/#{url}"
 
       # is it time to update the cache?
       time = read_fragment(time_key)
       if time.nil? or time.to_time < Time.now
         Rails.logger.debug "InLink Ads: last fragment time EXPIRED - refreshing '#{data_key}'"
         @links = requester(url)
+        write_fragment last_modified_key, Time.now
     
         # if we can get the latest, then update the cache
         unless @links.nil? or @links['Link'].nil?
