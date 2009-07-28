@@ -66,8 +66,12 @@ module InLinkAds
         last = read_fragment(last_key) || 0
         max = read_fragment(max_key) || max_post_id
 
-        posts = read_posts(last, 100)
-        last = posts.last.id
+        if params[:textlinkads_post_id]
+          posts = read_posts(params[:textlinkads_post_id], 1)
+        else
+          posts = read_posts(last, 100)
+          last = posts.last.id
+        end
 
         write_fragment last_key, last
         write_fragment max_key, max

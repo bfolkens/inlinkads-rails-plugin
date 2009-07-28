@@ -87,6 +87,16 @@ class InLinkAdsTest < Test::Unit::TestCase
     XML
   end
   
+  def test_should_respond_with_sync_one_post
+    @params = { :textlinkads_key => InLinkAds::Config.key,
+                :textlinkads_action => 'sync_posts',
+                :textlinkads_post_id => '123' }
+    render_sync_posts
+    assert_equal @rendered[:xml], <<-XML.strip
+<posts><post><id>123</id><title>Hello+World</title><date>Wed Dec 31 18:00:00 -0600 1969</date><url>http://www.mysite.com/posts/123</url><body>Some+text+here+that+should+get+replaced++++with+links.</body></post></posts>
+    XML
+  end
+  
   protected
   
   def max_post_id; Post.example.id; end
