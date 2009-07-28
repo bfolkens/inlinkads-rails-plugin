@@ -101,5 +101,6 @@ class InLinkAdsTest < Test::Unit::TestCase
   
   def max_post_id; Post.example.id; end
   def read_posts(last, limit); [Post.example]; end
+  def read_post(id); [Post.example]; end
   def post_url(record); "http://www.mysite.com/posts/#{record.id}"; end
 end

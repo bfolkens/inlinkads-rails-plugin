@@ -67,7 +67,7 @@ module InLinkAds
         max = read_fragment(max_key) || max_post_id
 
         if params[:textlinkads_post_id]
-          posts = read_posts(params[:textlinkads_post_id], 1)
+          posts = [read_post(params[:textlinkads_post_id])].compact
         else
           posts = read_posts(last, 100)
           last = posts.last.id
@@ -125,6 +125,10 @@ module InLinkAds
       end
     end
     
+		def read_post(id)
+      raise 'Need to define "read_post" in ApplicationController'
+		end
+
     def read_posts(last, limit)
       raise 'Need to define "read_posts" in ApplicationController'
     end
