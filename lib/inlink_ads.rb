@@ -69,8 +69,8 @@ module InLinkAds
       when 'debug'
         render :xml => debug_data(:last_id => last,
                                   :max_id => max,
-                                  :last_updated => last_modified && last_modified.rfc2822,
-                                  :next_update => time && time.rfc2822)
+                                  :last_updated => last_modified.to_s,
+                                  :next_update => time.to_s)
       when 'sync_posts'
         if params[:textlinkads_post_id]
           posts = [read_post(params[:textlinkads_post_id])].compact
