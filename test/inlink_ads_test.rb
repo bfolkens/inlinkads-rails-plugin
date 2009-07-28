@@ -102,7 +102,7 @@ class InLinkAdsTest < Test::Unit::TestCase
                 :textlinkads_action => 'debug' }
     render_sync_posts
     assert_equal <<-XML.strip, @rendered[:xml]
-<debug><last_id>0</last_id><max_id>123</max_id><last_updated></last_updated></debug>
+<debug><next_update></next_update><max_id>123</max_id><last_updated></last_updated><last_id>0</last_id></debug>
     XML
   end
   
