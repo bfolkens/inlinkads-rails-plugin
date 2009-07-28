@@ -58,23 +58,22 @@ module InLinkAds
       url = request_url
       last_key = "TLA/LAST/#{url}"
       max_key = "TLA/MAX/#{url}"
+      time_key = "TLA/TIME/#{url}"
+      last = read_fragment(last_key) || 0
+      max = read_fragment(max_key) || max_post_id
             
       case params[:textlinkads_action]
       when 'debug'
-        render :text => 'debug'
+        render :xml => debug_data(:last_id => last, :max_id => max, :last_updated => read_fragment(time_key))
       when 'sync_posts'
-        last = read_fragment(last_key) || 0
-        max = read_fragment(max_key) || max_post_id
-
         if params[:textlinkads_post_id]
           posts = [read_post(params[:textlinkads_post_id])].compact
         else
           posts = read_posts(last, 100)
           last = posts.last.id
+          write_fragment last_key, last
+          write_fragment max_key, max
         end
-
-        write_fragment last_key, last
-        write_fragment max_key, max
 
         render :xml => posts_to_xml(posts)
       when 'reset_syncing'
@@ -173,6 +172,15 @@ module InLinkAds
             xml.url post_url(record)
             xml.body CGI::escape(record.body.gsub(/[\r\n]+/, ' ').gsub(%r{<.+?/?>}, ''))
           end
+        end
+      end
+    end
+    
+    def debug_data(data)
+      xml = Builder::XmlMarkup.new
+      xml.debug do
+        data.each_pair do |key, value|
+          xml.tag! key, value
         end
       end
     end

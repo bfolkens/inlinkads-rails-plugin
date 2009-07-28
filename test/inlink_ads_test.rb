@@ -82,7 +82,7 @@ class InLinkAdsTest < Test::Unit::TestCase
     @params = { :textlinkads_key => InLinkAds::Config.key,
                 :textlinkads_action => 'sync_posts' }
     render_sync_posts
-    assert_equal @rendered[:xml], <<-XML.strip
+    assert_equal <<-XML.strip, @rendered[:xml]
 <posts><post><id>123</id><title>Hello+World</title><date>Wed Dec 31 18:00:00 -0600 1969</date><url>http://www.mysite.com/posts/123</url><body>Some+text+here+that+should+get+replaced++++with+links.</body></post></posts>
     XML
   end
@@ -92,8 +92,17 @@ class InLinkAdsTest < Test::Unit::TestCase
                 :textlinkads_action => 'sync_posts',
                 :textlinkads_post_id => '123' }
     render_sync_posts
-    assert_equal @rendered[:xml], <<-XML.strip
+    assert_equal <<-XML.strip, @rendered[:xml]
 <posts><post><id>123</id><title>Hello+World</title><date>Wed Dec 31 18:00:00 -0600 1969</date><url>http://www.mysite.com/posts/123</url><body>Some+text+here+that+should+get+replaced++++with+links.</body></post></posts>
+    XML
+  end
+  
+  def test_should_respond_to_debug
+    @params = { :textlinkads_key => InLinkAds::Config.key,
+                :textlinkads_action => 'debug' }
+    render_sync_posts
+    assert_equal <<-XML.strip, @rendered[:xml]
+<debug><last_id>0</last_id><max_id>123</max_id><last_updated></last_updated></debug>
     XML
   end
   
@@ -101,6 +110,6 @@ class InLinkAdsTest < Test::Unit::TestCase
   
   def max_post_id; Post.example.id; end
   def read_posts(last, limit); [Post.example]; end
-  def read_post(id); [Post.example]; end
+  def read_post(id); Post.example; end
   def post_url(record); "http://www.mysite.com/posts/#{record.id}"; end
 end
