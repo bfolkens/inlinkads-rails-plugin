@@ -1,6 +1,7 @@
 require 'net/http'
 require 'cgi'
 require 'timeout'
+require 'xmlsimple'
 require 'active_support'
 
 module InLinkAds
@@ -107,7 +108,7 @@ module InLinkAds
       # is it time to update the cache?
       time = read_fragment(time_key)
       if time.nil? or time.to_time < Time.now
-        Rails.logger.debug "InLink Ads: last fragment time EXPIRED - refreshing '#{data_key}'"
+        Rails.logger.debug "InLink Ads: last fragment time EXPIRED - refreshing '#{url}'"
         @links = requester(url)
         write_fragment last_modified_key, Time.now
     
