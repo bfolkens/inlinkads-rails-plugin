@@ -34,6 +34,7 @@ module InLinkAds::AdController
   
   def requester(url)
     XmlSimple.xml_in <<-XML
+    <?xml version="1.0" ?>
     <Links>
       <Link>
         <PostID>123</PostID>
@@ -51,6 +52,7 @@ class InLinkAdsTest < Test::Unit::TestCase
   def render(params); @rendered = params; end
   include ActionController::Caching
   include ActionView::Helpers::UrlHelper
+  include ActionView::Helpers::TagHelper
   
   include InLinkAds::ViewHelper
   include InLinkAds::AdController
@@ -82,7 +84,7 @@ class InLinkAdsTest < Test::Unit::TestCase
     @params = { :textlinkads_key => InLinkAds::Config.key,
                 :textlinkads_action => 'sync_posts' }
     render_sync_posts
-    assert_equal <<-XML.strip, @rendered[:xml]
+    assert_xml_match <<-XML.strip, @rendered[:xml]
 <posts><post><id>123</id><title>Hello+World</title><date>Wed Dec 31 18:00:00 -0600 1969</date><url>http://www.mysite.com/posts/123</url><body>Some+text+here+that+should+get+replaced++++with+links.</body></post></posts>
     XML
   end
@@ -92,7 +94,7 @@ class InLinkAdsTest < Test::Unit::TestCase
                 :textlinkads_action => 'sync_posts',
                 :textlinkads_post_id => '123' }
     render_sync_posts
-    assert_equal <<-XML.strip, @rendered[:xml]
+    assert_xml_match <<-XML.strip, @rendered[:xml]
 <posts><post><id>123</id><title>Hello+World</title><date>Wed Dec 31 18:00:00 -0600 1969</date><url>http://www.mysite.com/posts/123</url><body>Some+text+here+that+should+get+replaced++++with+links.</body></post></posts>
     XML
   end
@@ -101,7 +103,7 @@ class InLinkAdsTest < Test::Unit::TestCase
     @params = { :textlinkads_key => InLinkAds::Config.key,
                 :textlinkads_action => 'debug' }
     render_sync_posts
-    assert_equal <<-XML.strip, @rendered[:xml]
+    assert_xml_match <<-XML.strip, @rendered[:xml]
 <debug><next_update></next_update><max_id>123</max_id><last_updated></last_updated><last_id>0</last_id></debug>
     XML
   end
@@ -112,4 +114,8 @@ class InLinkAdsTest < Test::Unit::TestCase
   def read_posts(last, limit); [Post.example]; end
   def read_post(id); Post.example; end
   def post_url(record); "http://www.mysite.com/posts/#{record.id}"; end
+  
+  def assert_xml_match(expected, actual, message = nil)
+    assert_equal XmlSimple.xml_in(expected), XmlSimple.xml_in(actual), message
+  end
 end
